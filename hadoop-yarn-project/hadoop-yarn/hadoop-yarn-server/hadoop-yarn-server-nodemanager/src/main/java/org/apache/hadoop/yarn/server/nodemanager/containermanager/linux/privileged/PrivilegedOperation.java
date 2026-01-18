@@ -50,6 +50,7 @@ public class PrivilegedOperation {
     TC_MODIFY_STATE("--tc-modify-state"),
     TC_READ_STATE("--tc-read-state"),
     TC_READ_STATS("--tc-read-stats"),
+    RUN_BPF_BANDWIDTH("--bpf-limit-bandwidth"),
     ADD_PID_TO_CGROUP(""), //no CLI switch supported yet.
     RUN_DOCKER_CMD("--run-docker"),
     GPU("--module-gpu"),

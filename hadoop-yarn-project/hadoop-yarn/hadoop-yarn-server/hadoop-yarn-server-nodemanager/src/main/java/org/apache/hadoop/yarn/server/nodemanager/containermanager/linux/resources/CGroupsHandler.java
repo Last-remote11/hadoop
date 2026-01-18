@@ -48,6 +48,7 @@ public interface CGroupsHandler {
 
     // v2 specific
     IO("io", false, true),
+    MISC("misc", false, true),
 
     // present in v1 and v2
     CPU("cpu", true, true),

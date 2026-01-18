@@ -58,7 +58,7 @@ import static org.apache.hadoop.yarn.server.nodemanager.containermanager.linux.r
 
 /**
  * This class is a {@link ContainerRuntime} implementation that uses the
- * native {@code container-executor} binary via a
+ * native {@code container-executor} binary via a 네이티브 씀
  * {@link PrivilegedOperationExecutor} instance to launch processes using the
  * standard process model.
  */

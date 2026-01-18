@@ -60,7 +60,7 @@ public class PrivilegedOperationExecutor {
         System.getenv(ApplicationConstants.Environment.HADOOP_YARN_HOME.key());
     File hadoopBin = new File(yarnHomeEnvVar, "bin");
     String defaultPath =
-        new File(hadoopBin, "container-executor").getAbsolutePath();
+        new File(hadoopBin, "container-executor").getAbsolutePath(); // 여기서 바이너리
     return null == conf
         ? defaultPath
         : conf.get(YarnConfiguration.NM_LINUX_CONTAINER_EXECUTOR_PATH,

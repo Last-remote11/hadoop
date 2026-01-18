@@ -46,6 +46,7 @@ check_function_exists(fdopendir HAVE_FDOPENDIR)
 check_function_exists(fstatat HAVE_FSTATAT)
 check_function_exists(openat HAVE_OPENAT)
 check_function_exists(unlinkat HAVE_UNLINKAT)
+check_function_exists(bpf HAVE_BPF)
 
 include(CheckSymbolExists)
 check_symbol_exists(sysctl "sys/types.h;sys/sysctl.h" HAVE_SYSCTL)
@@ -214,6 +215,40 @@ add_executable(test-oom-listener
         main/native/oom-listener/impl/oom_listener.h
         main/native/oom-listener/test/oom_listener_test_main.cc
 )
+
+# BPF
+find_path(LIBBPF_INCLUDE_DIR NAMES bpf/libbpf.h)
+find_library(LIBBPF_LIB NAMES bpf)
+find_program(CLANG_EXE clang)
+
+if (HAVE_BPF AND LIBBPF_INCLUDE_DIR AND LIBBPF_LIB)
+    add_executable(egress
+     	main/native/bpf-program/bandwidth/impl/egress.c
+		main/native/bpf-program/bandwidth/impl/egress.h
+	)
+    target_include_directories(egress PRIVATE ${LIBBPF_INCLUDE_DIR})
+    target_link_libraries(egress PRIVATE ${LIBBPF_LIB} elf z)
+
+    output_directory(egress target/usr/local/bin)
+
+    add_custom_command(
+        OUTPUT target/usr/local/bin/egress_bpf.o
+        COMMAND ${CLANG_EXE} -g -O2 -target bpf
+         		-c main/native/bpf-program/bandwidth/impl/egress_bpf.c
+                -o target/usr/local/bin/egress_bpf.o
+    )
+endif()
+
+if (HAVE_BPF)
+	add_executable(egress
+		main/native/bpf-program/bandwidth/impl/egress.c
+		main/native/bpf-program/bandwidth/impl/egress.h
+    )
+    add_executable(egress_bpf
+        main/native/bpf-program/bandwidth/impl/egress_bpf.c
+    )
+endif()
+
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     # macOS doesn't have librt
     target_link_libraries(test-oom-listener gtest)

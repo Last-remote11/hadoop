@@ -235,7 +235,7 @@ public class CGroupElasticMemoryController extends SubjectInheritingThread {
   /**
    * Main OOM listening thread. It uses an external process to listen to
    * Linux events. The external process does not need to run as root, so
-   * it is not related to container-executor. We do not use JNI for security
+   * it is not related to container-executor. We do not use JNI for security JNI 안쓰는군
    * reasons.
    */
   @Override
@@ -250,7 +250,7 @@ public class CGroupElasticMemoryController extends SubjectInheritingThread {
 
       // Start a listener process
       ProcessBuilder oomListener = new ProcessBuilder();
-      oomListener.command(oomListenerPath, yarnCGroupPath);
+      oomListener.command(oomListenerPath, yarnCGroupPath); // 또다른 c 프로그램인 oom-listenser 사용
       synchronized (this) {
         if (!stopped) {
           process = oomListener.start();

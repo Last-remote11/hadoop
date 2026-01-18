@@ -32,7 +32,7 @@ public class CGroupsMountConfig {
 
   public CGroupsMountConfig(Configuration conf) {
     this.enableMount = conf.getBoolean(YarnConfiguration.
-        NM_LINUX_CONTAINER_CGROUPS_MOUNT, false);
+        NM_LINUX_CONTAINER_CGROUPS_MOUNT, false); //Whether the LCE should attempt to mount cgroups if not found. This property only applies when the LCE resources handler is set to CgroupsLCEResourcesHandler.
     this.mountPath = conf.get(YarnConfiguration.
         NM_LINUX_CONTAINER_CGROUPS_MOUNT_PATH, null);
     this.v2MountPath = conf.get(YarnConfiguration.

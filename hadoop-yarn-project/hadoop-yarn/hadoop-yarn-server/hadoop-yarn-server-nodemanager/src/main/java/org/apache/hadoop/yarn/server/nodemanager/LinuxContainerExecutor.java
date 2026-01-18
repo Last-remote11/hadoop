@@ -570,6 +570,7 @@ public class LinuxContainerExecutor extends ContainerExecutor {
             container.getResource());
     String resourcesOptions = resourcesHandler.getResourcesOption(containerId);
     String tcCommandFile = null;
+    String bpfBandwidthFile = null;
     List<String> numaArgs = null;
 
     try {
@@ -591,6 +592,9 @@ public class LinuxContainerExecutor extends ContainerExecutor {
               break;
             case TC_MODIFY_STATE:
               tcCommandFile = op.getArguments().get(0);
+              break;
+            case RUN_BPF_BANDWIDTH:
+              bpfBandwidthFile = op.getArguments().get(0);
               break;
             case ADD_NUMA_PARAMS:
               numaArgs = op.getArguments();

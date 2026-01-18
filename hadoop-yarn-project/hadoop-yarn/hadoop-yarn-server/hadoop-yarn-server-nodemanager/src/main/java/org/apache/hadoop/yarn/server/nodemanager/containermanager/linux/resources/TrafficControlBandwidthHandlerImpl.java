@@ -22,9 +22,7 @@ package org.apache.hadoop.yarn.server.nodemanager.containermanager.linux.resourc
 
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.api.records.ContainerId;
-import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.Container;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.linux.privileged.PrivilegedOperation;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.linux.privileged.PrivilegedOperationException;
@@ -41,86 +39,23 @@ import java.util.concurrent.ConcurrentHashMap;
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
 public class TrafficControlBandwidthHandlerImpl
-    implements OutboundBandwidthResourceHandler {
+    extends AbstractBandwidthHandler {
 
   private static final Logger LOG =
        LoggerFactory.getLogger(TrafficControlBandwidthHandlerImpl.class);
   //In the absence of 'scheduling' support, we'll 'infer' the guaranteed
   //outbound bandwidth for each container based on this number. This will
   //likely go away once we add support on the RM for this resource type.
-  private static final int MAX_CONTAINER_COUNT = 50;
 
-  private final PrivilegedOperationExecutor privilegedOperationExecutor;
-  private final CGroupsHandler cGroupsHandler;
   private final TrafficController trafficController;
   private final ConcurrentHashMap<ContainerId, Integer> containerIdClassIdMap;
-
-  private Configuration conf;
-  private String device;
-  private boolean strictMode;
-  private int containerBandwidthMbit;
-  private int rootBandwidthMbit;
-  private int yarnBandwidthMbit;
 
   public TrafficControlBandwidthHandlerImpl(PrivilegedOperationExecutor
       privilegedOperationExecutor, CGroupsHandler cGroupsHandler,
       TrafficController trafficController) {
-    this.privilegedOperationExecutor = privilegedOperationExecutor;
-    this.cGroupsHandler = cGroupsHandler;
-    this.trafficController = trafficController;
+    super(privilegedOperationExecutor, cGroupsHandler);
     this.containerIdClassIdMap = new ConcurrentHashMap<>();
-  }
-
-  /**
-   * Bootstrapping 'outbound-bandwidth' resource handler - mounts net_cls
-   * controller and bootstraps a traffic control bandwidth shaping hierarchy
-   * @param configuration yarn configuration in use
-   * @return (potentially empty) list of privileged operations to execute.
-   * @throws ResourceHandlerException
-   */
-
-  @Override
-  public List<PrivilegedOperation> bootstrap(Configuration configuration)
-      throws ResourceHandlerException {
-    conf = configuration;
-    //We'll do this inline for the time being - since this is a one time
-    //operation. At some point, LCE code can be refactored to batch mount
-    //operations across multiple controllers - cpu, net_cls, blkio etc
-    cGroupsHandler
-        .initializeCGroupController(CGroupsHandler.CGroupController.NET_CLS);
-    device = conf.get(YarnConfiguration.NM_NETWORK_RESOURCE_INTERFACE,
-        YarnConfiguration.DEFAULT_NM_NETWORK_RESOURCE_INTERFACE);
-    strictMode = configuration.getBoolean(YarnConfiguration
-        .NM_LINUX_CONTAINER_CGROUPS_STRICT_RESOURCE_USAGE, YarnConfiguration
-        .DEFAULT_NM_LINUX_CONTAINER_CGROUPS_STRICT_RESOURCE_USAGE);
-    rootBandwidthMbit = conf.getInt(YarnConfiguration
-        .NM_NETWORK_RESOURCE_OUTBOUND_BANDWIDTH_MBIT, YarnConfiguration
-        .DEFAULT_NM_NETWORK_RESOURCE_OUTBOUND_BANDWIDTH_MBIT);
-    yarnBandwidthMbit = conf.getInt(YarnConfiguration
-        .NM_NETWORK_RESOURCE_OUTBOUND_BANDWIDTH_YARN_MBIT, rootBandwidthMbit);
-    containerBandwidthMbit = (int) Math.ceil((double) yarnBandwidthMbit /
-        MAX_CONTAINER_COUNT);
-
-    StringBuilder logLine = new StringBuilder("strict mode is set to :")
-        .append(strictMode).append(System.lineSeparator());
-
-    if (strictMode) {
-      logLine.append("container bandwidth will be capped to soft limit.")
-          .append(System.lineSeparator());
-    } else {
-      logLine.append(
-          "containers will be allowed to use spare YARN bandwidth.")
-          .append(System.lineSeparator());
-    }
-
-    logLine
-        .append("containerBandwidthMbit soft limit (in mbit/sec) is set to : ")
-        .append(containerBandwidthMbit);
-
-    LOG.info(logLine.toString());
-    trafficController.bootstrap(device, rootBandwidthMbit, yarnBandwidthMbit);
-
-    return null;
+    this.trafficController = trafficController;
   }
 
   /**
@@ -201,12 +136,6 @@ public class TrafficControlBandwidthHandlerImpl
     return null;
   }
 
-  @Override
-  public List<PrivilegedOperation> updateContainer(Container container)
-      throws ResourceHandlerException {
-    return null;
-  }
-
   /**
    * Returns total bytes sent per container to be used for metrics tracking
    * purposes.
@@ -283,5 +212,14 @@ public class TrafficControlBandwidthHandlerImpl
   @Override
   public String toString() {
     return TrafficControlBandwidthHandlerImpl.class.getName();
+  }
+
+  @Override public CGroupsHandler.CGroupController getCgroupController() {
+    return CGroupsHandler.CGroupController.NET_CLS;
+  }
+
+  @Override
+  public void additionalBootstrap() throws ResourceHandlerException {
+    trafficController.bootstrap(device, rootBandwidthMbit, yarnBandwidthMbit);
   }
 }

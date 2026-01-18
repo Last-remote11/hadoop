@@ -137,7 +137,7 @@ class CGroupsV2HandlerImpl extends AbstractCGroupsHandler {
    * @throws IOException if the file is not found or cannot be read
    */
   public Set<String> readControllersFile(String cgroupPath) throws IOException {
-    File cgroupControllersFile = new File(cgroupPath + Path.SEPARATOR + CGROUP_CONTROLLERS_FILE);
+    File cgroupControllersFile = new File(cgroupPath + Path.SEPARATOR + CGROUP_CONTROLLERS_FILE); // cgroup.controllers 읽음
     if (!cgroupControllersFile.exists()) {
       throw new IOException("No cgroup controllers file found in the directory specified: " +
               cgroupPath);

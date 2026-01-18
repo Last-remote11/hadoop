@@ -74,6 +74,10 @@
 #include "compat/unlinkat.h"
 #endif
 
+#ifndef HAVE_BPF
+#include "compat/openat.h"
+#endif
+
 // include cgroup2 super magic number if not defined
 #ifndef CGROUP2_SUPER_MAGIC
 #define CGROUP2_SUPER_MAGIC 0x63677270
@@ -89,6 +93,7 @@ static const int DEFAULT_TC_SUPPORT_ENABLED = 0;
 static const int DEFAULT_MOUNT_CGROUP_SUPPORT_ENABLED = 0;
 static const int DEFAULT_YARN_SYSFS_SUPPORT_ENABLED = 0;
 static const int DEFAULT_RUNC_SUPPORT_ENABLED = 0;
+static const int DEFAULT_BPF_SUPPORT_ENABLED = 0;
 
 static const char* PROC_PATH = "/proc";
 
@@ -97,6 +102,9 @@ static const char* TC_BIN = "/sbin/tc";
 static const char* TC_MODIFY_STATE_OPTS [] = { "-b" , NULL};
 static const char* TC_READ_STATE_OPTS [] = { "-b", NULL};
 static const char* TC_READ_STATS_OPTS [] = { "-s",  "-b", NULL};
+
+//location of BPF runner? binary
+static const char* BPF_BIN = ""; // HADOOP_YARN_HOME/bin/egress
 
 //struct to store the user details
 struct serialized_passwd *user_detail = NULL;
@@ -561,6 +569,11 @@ int is_runc_support_enabled() {
   return is_feature_enabled(RUNC_SUPPORT_ENABLED_KEY,
                             DEFAULT_RUNC_SUPPORT_ENABLED, &executor_cfg)
       || runc_module_enabled(&CFG);
+}
+
+int is_bpf_support_enabled() {
+  return is_feature_enabled(BPF_ENABLED_KEY,
+                            DEFAULT_BPF_ENABLED_KEY, &executor_cfg)
 }
 
 /**
@@ -3109,6 +3122,28 @@ int traffic_control_read_state(char *command_file) {
  */
 int traffic_control_read_stats(char *command_file) {
   return run_traffic_control(TC_READ_STATS_OPTS, command_file);
+}
+
+/**
+ * Run a bpf program runner.
+ */
+int run_bpf_egress_limiter(char *cgroup_id, char *mbps) {
+  // cgroup path, bandwidth
+  pid_t child_pid = fork();
+  if (child_pid != 0) {
+    int exit_code = wait_and_get_exit_code(child_pid);
+    if (exit_code != 0) {
+      fprintf(LOGFILE, "failed to execute bpf command!\n");
+      return TRAFFIC_CONTROL_EXECUTION_FAILED;
+    }
+    return 0;
+  } else {
+    execv(BPF_BIN, (char**)cgroup_id, (char**)mbps);
+    //if we reach here, exec failed
+    fprintf(LOGFILE, "failed to execute tc command! error: %s\n", strerror(errno));
+    _exit(TRAFFIC_CONTROL_EXECUTION_FAILED);
+  }
+  return
 }
 
 /**

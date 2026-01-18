@@ -465,7 +465,7 @@ import java.util.regex.Pattern;
     //extract and return 4 digits
     //e.g 00420005 -> 0005
     return Integer.parseInt(classIdStr.substring(4));
-  }
+  } // classId의 앞 4자리와 뒤 4자리가 담당하는 역할이 달라서 그런거였구나
 
   /**
    * Adds a tc class to qdisc at root
@@ -505,10 +505,11 @@ import java.util.regex.Pattern;
     String ceilMbitStr = ceilMbit + MBIT_SUFFIX;
     //example : "class add dev eth0 parent 42:99 classid 42:99 htb rate 50mbit
     // ceil 700mbit"
+    // "class add dev %s parent %d:%d classid %d:%d htb rate %s ceil %s";
     return String.format(FORMAT_CLASS_ADD_TO_PARENT_WITH_RATES, device,
         ROOT_QDISC_HANDLE, YARN_ROOT_CLASS_ID, ROOT_QDISC_HANDLE, classId,
         rateMbitStr, ceilMbitStr);
-  }
+  } // 실제로 트래픽 제한하는 qdisc가 여기서 생김
 
   private String getStringForDeleteContainerClass(int classId) {
     //example "class del dev eth0 classid 42:7"
@@ -614,6 +615,7 @@ import java.util.regex.Pattern;
     }
 
     public PrivilegedOperation commitBatchToTempFile()
+        // command 들 임시 파일에 저장하고 임시 파일의 위치 넘김.
         throws ResourceHandlerException {
       try {
         File tcCmds = File.createTempFile(TMP_FILE_PREFIX, TMP_FILE_SUFFIX, new

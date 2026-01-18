@@ -65,8 +65,7 @@ public class ResourceHandlerModule {
    */
   private static volatile CGroupsHandler cGroupV1Handler;
   private static volatile CGroupsHandler cGroupV2Handler;
-  private static volatile TrafficControlBandwidthHandlerImpl
-      trafficControlBandwidthHandler;
+  private static volatile OutboundBandwidthResourceHandler BandwidthHandler;
   private static volatile NetworkPacketTaggingHandlerImpl
       networkPacketTaggingHandlerImpl;
   private static volatile CGroupsBlkioResourceHandlerImpl
@@ -199,27 +198,33 @@ public class ResourceHandlerModule {
     return null;
   }
 
-  private static TrafficControlBandwidthHandlerImpl
-      getTrafficControlBandwidthHandler(Configuration conf)
+  private static OutboundBandwidthResourceHandler getlBandwidthHandler(Configuration conf)
         throws ResourceHandlerException {
-    if (conf.getBoolean(YarnConfiguration.NM_NETWORK_RESOURCE_ENABLED,
+    if (conf.getBoolean(YarnConfiguration.NM_NETWORK_RESOURCE_ENABLED, // bandwidthHandler 켜졌을 때만 BPF 켜기
         YarnConfiguration.DEFAULT_NM_NETWORK_RESOURCE_ENABLED)) {
-      if (trafficControlBandwidthHandler == null) {
+      if (BandwidthHandler == null) {
         synchronized (OutboundBandwidthResourceHandler.class) {
-          if (trafficControlBandwidthHandler == null) {
+          if (BandwidthHandler == null) {
             LOG.info("Creating new traffic control bandwidth handler.");
 
             initializeCGroupHandlers(conf, CGroupsHandler.CGroupController.NET_CLS);
-            trafficControlBandwidthHandler = new
-                TrafficControlBandwidthHandlerImpl(PrivilegedOperationExecutor
-                .getInstance(conf), cGroupV1Handler,
-                new TrafficController(conf, PrivilegedOperationExecutor
-                    .getInstance(conf)));
+            initializeCGroupHandlers(conf, CGroupsHandler.CGroupController.MISC);
+            // 여기서 V1, V2 가 갈리겠군
+            if (isMountedInCGroupsV1(CGroupsHandler.CGroupController.NET_CLS)) {
+              BandwidthHandler = new TrafficControlBandwidthHandlerImpl(
+                  PrivilegedOperationExecutor.getInstance(conf), cGroupV1Handler,
+                  new TrafficController(conf, PrivilegedOperationExecutor
+                      .getInstance(conf)));
+            } else {
+              BandwidthHandler = new BPFBandwidthHandlerImpl(PrivilegedOperationExecutor
+                  .getInstance(conf), cGroupV2Handler);
+            }
+
           }
         }
       }
 
-      return trafficControlBandwidthHandler;
+      return BandwidthHandler;
     } else {
       return null;
     }
@@ -235,7 +240,7 @@ public class ResourceHandlerModule {
       return getNetworkTaggingHandler(conf);
     } else {
       LOG.info("Using traffic control bandwidth handler");
-      return getTrafficControlBandwidthHandler(conf);
+      return getlBandwidthHandler(conf);
     }
   }
 
@@ -259,7 +264,7 @@ public class ResourceHandlerModule {
   public static OutboundBandwidthResourceHandler
       initOutboundBandwidthResourceHandler(Configuration conf)
       throws ResourceHandlerException {
-    return getTrafficControlBandwidthHandler(conf);
+    return getlBandwidthHandler(conf);
   }
 
   public static DiskResourceHandler initDiskResourceHandler(Configuration conf)

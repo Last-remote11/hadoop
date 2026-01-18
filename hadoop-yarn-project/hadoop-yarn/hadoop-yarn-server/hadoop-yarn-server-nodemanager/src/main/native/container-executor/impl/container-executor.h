@@ -54,7 +54,8 @@ enum operations {
   RUN_AS_USER_SYNC_YARN_SYSFS = 15,
   EXEC_CONTAINER = 16,
   RUN_RUNC_CONTAINER = 17,
-  REAP_RUNC_LAYER_MOUNTS = 18
+  REAP_RUNC_LAYER_MOUNTS = 18,
+  BPF_LIMIT_BANDWIDTH = 19,
 };
 
 #define NM_GROUP_KEY "yarn.nodemanager.linux-container-executor.group"
@@ -75,6 +76,8 @@ enum operations {
 #define MOUNT_CGROUP_SUPPORT_ENABLED_KEY "feature.mount-cgroup.enabled"
 #define YARN_SYSFS_SUPPORT_ENABLED_KEY "feature.yarn.sysfs.enabled"
 #define RUNC_SUPPORT_ENABLED_KEY "feature.runc.enabled"
+#define BPF_SUPPORT_ENABLED_KEY "feature.bpf.enabled"
+#define BPF_BIN_PATH_KEY="bpf.bin.path"
 #define TMP_DIR "tmp"
 #define ROOT_TMP_DIR "private_slash_tmp"
 #define ROOT_VAR_TMP_DIR "private_var_slash_tmp"

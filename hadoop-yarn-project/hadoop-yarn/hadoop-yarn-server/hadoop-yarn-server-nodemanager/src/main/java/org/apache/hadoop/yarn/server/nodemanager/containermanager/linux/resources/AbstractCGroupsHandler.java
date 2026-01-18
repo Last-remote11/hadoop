@@ -135,7 +135,7 @@ public abstract class AbstractCGroupsHandler implements CGroupsHandler {
 
       if (newMtab == null) {
         // parse mtab
-        newMtab = parseMtab(mtabFile);
+        newMtab = parseMtab(mtabFile); // mtab 모양이 결정함
       }
 
       // find cgroup controller paths
@@ -208,9 +208,9 @@ public abstract class AbstractCGroupsHandler implements CGroupsHandler {
           String type = m.group(2);
           String options = m.group(3);
 
-          Set<String> controllerSet = handleMtabEntry(path, type, options);
+          Set<String> controllerSet = handleMtabEntry(path, type, options); // cgroup2path : cgroup.controller 내용들 넘김
           if (controllerSet != null) {
-            ret.put(path, controllerSet);
+            ret.put(path, controllerSet); // path: /sys/fs/cgroup => {cgroup.controller 의 컨트롤러들}
           }
         }
       }
@@ -269,6 +269,7 @@ public abstract class AbstractCGroupsHandler implements CGroupsHandler {
   public String getPathForCGroup(CGroupController controller, String cGroupId) {
     return getControllerPath(controller) + Path.SEPARATOR + cGroupPrefix
         + Path.SEPARATOR + cGroupId;
+//    getControllerPath 에서 그냥 /sys/fs/cgroup 를 넘김
   }
 
   @Override
@@ -296,10 +297,10 @@ public abstract class AbstractCGroupsHandler implements CGroupsHandler {
   @Override
   public void initializeCGroupController(CGroupController controller) throws
       ResourceHandlerException {
-    if (this.cGroupsMountConfig.isMountEnabled() &&
+    if (this.cGroupsMountConfig.isMountEnabled() && // 이거 기본값 false.  cgroup v2 면 cgroup 이미 preconfigured 라고 가정하나?
         cGroupsMountConfig.ensureMountPathIsDefined()) {
       // We have a controller that needs to be mounted
-      mountCGroupController(controller);
+      mountCGroupController(controller); // 일단 v2 는 여기 안 도달한다고 가정
     }
 
     // We are working with a pre-mounted contoller
@@ -325,7 +326,7 @@ public abstract class AbstractCGroupsHandler implements CGroupsHandler {
       throws ResourceHandlerException {
     // Check permissions to cgroup hierarchy and
     // create YARN cgroup if it does not exist, yet
-    String controllerPath = getControllerPath(controller);
+    String controllerPath = getControllerPath(controller); // v2 도 나름의 방법으로 잘 가져옴. /sys/fs/cgroup
 
     if (controllerPath == null) {
       throw new ResourceHandlerException(
@@ -378,7 +379,7 @@ public abstract class AbstractCGroupsHandler implements CGroupsHandler {
       ));
     }
 
-    updateEnabledControllersInHierarchy(yarnHierarchy, controller);
+    updateEnabledControllersInHierarchy(yarnHierarchy, controller); // cgroup.subtree 랑 싱크해줌
   }
 
   protected abstract void updateEnabledControllersInHierarchy(
@@ -403,9 +404,9 @@ public abstract class AbstractCGroupsHandler implements CGroupsHandler {
   }
 
   @Override
-  public String createCGroup(CGroupController controller, String cGroupId)
+  public String createCGroup(CGroupController controller, String cGroupId) // traffic : 컨테이너 id
       throws ResourceHandlerException {
-    String path = getPathForCGroup(controller, cGroupId);
+    String path = getPathForCGroup(controller, cGroupId); // 이거 그냥 /sys/fs/cgroup/hadoop-yarn/<컨테이너id> 인데?
     File cgroup = new File(path);
     LOG.debug("createCgroup: {}", path);
 
