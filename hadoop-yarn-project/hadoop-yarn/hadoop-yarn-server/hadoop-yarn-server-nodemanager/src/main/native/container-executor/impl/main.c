@@ -242,7 +242,8 @@ static void display_feature_disabled_message(const char* name) {
 static struct {
   char *cgroups_hierarchy;
   char *traffic_control_command_file;
-  char *bpf_limit_bandwidth_command_file;
+  char *bpf_limit_bandwidth_cgroup_path;
+  char *bpf_limit_bandwidth_mbit;
   const char *run_as_user_name;
   const char *yarn_user_name;
   char *local_dirs;
@@ -705,6 +706,10 @@ int main(int argc, char **argv) {
     break;
   case TRAFFIC_CONTROL_READ_STATS:
     exit_code = traffic_control_read_stats(cmd_input.traffic_control_command_file);
+    break;
+  case
+  case BPF_LIMIT_BANDWIDTH:
+    exit_code = run_bpf_egress_limiter(cmd_input.traffic_control_command_file);
     break;
   case
   case EXEC_CONTAINER:

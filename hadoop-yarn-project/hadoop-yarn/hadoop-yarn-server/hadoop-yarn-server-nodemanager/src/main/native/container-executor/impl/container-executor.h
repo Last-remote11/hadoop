@@ -77,7 +77,7 @@ enum operations {
 #define YARN_SYSFS_SUPPORT_ENABLED_KEY "feature.yarn.sysfs.enabled"
 #define RUNC_SUPPORT_ENABLED_KEY "feature.runc.enabled"
 #define BPF_SUPPORT_ENABLED_KEY "feature.bpf.enabled"
-#define BPF_BIN_PATH_KEY="bpf.bin.path"
+#define BPF_BIN_PATH_KEY "bpf.bin.path"
 #define TMP_DIR "tmp"
 #define ROOT_TMP_DIR "private_slash_tmp"
 #define ROOT_VAR_TMP_DIR "private_var_slash_tmp"

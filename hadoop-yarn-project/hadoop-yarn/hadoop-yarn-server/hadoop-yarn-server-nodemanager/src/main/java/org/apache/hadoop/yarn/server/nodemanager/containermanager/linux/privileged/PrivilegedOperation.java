@@ -29,7 +29,8 @@ import java.util.List;
 
 /**
  * Represents operations that require higher system privileges - e.g
- * creating cgroups, launching containers as specified users, 'tc' commands etc
+ * creating cgroups, launching containers as specified users,
+ * 'tc' commands, handling BPF program etc.
  * that are completed using the container-executor binary
  */
 

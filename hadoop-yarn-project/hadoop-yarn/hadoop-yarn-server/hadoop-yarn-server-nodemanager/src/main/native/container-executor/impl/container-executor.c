@@ -572,8 +572,8 @@ int is_runc_support_enabled() {
 }
 
 int is_bpf_support_enabled() {
-  return is_feature_enabled(BPF_ENABLED_KEY,
-                            DEFAULT_BPF_ENABLED_KEY, &executor_cfg)
+  return is_feature_enabled(BPF_SUPPORT_ENABLED_KEY,
+                            DEFAULT_BPF_SUPPORT_ENABLED, &executor_cfg);
 }
 
 /**
@@ -3127,7 +3127,7 @@ int traffic_control_read_stats(char *command_file) {
 /**
  * Run a bpf program runner.
  */
-int run_bpf_egress_limiter(char *cgroup_id, char *mbps) {
+int run_bpf_egress_limiter(char *cgroup_path, char *mbps) {
   // cgroup path, bandwidth
   pid_t child_pid = fork();
   if (child_pid != 0) {
@@ -3138,12 +3138,13 @@ int run_bpf_egress_limiter(char *cgroup_id, char *mbps) {
     }
     return 0;
   } else {
-    execv(BPF_BIN, (char**)cgroup_id, (char**)mbps);
+    char *args[] = { BPF_BIN, cgroup_path, mbps, NULL };
+    execv(BPF_BIN, args);
     //if we reach here, exec failed
     fprintf(LOGFILE, "failed to execute tc command! error: %s\n", strerror(errno));
     _exit(TRAFFIC_CONTROL_EXECUTION_FAILED);
   }
-  return
+  return 0;
 }
 
 /**
