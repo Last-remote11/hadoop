@@ -370,14 +370,15 @@ static int validate_arguments(int argc, char **argv , int *operation) {
     }
   }
 
-  if (strcmp("--bpf-limit-bandwidth"), argv[1]) == 0) {
+  if (strcmp("--bpf-limit-bandwidth", argv[1]) == 0) {
     if(is_bpf_support_enabled()) {
 	  if (argc != 4) {
 		display_usage(stdout);
 		return INVALID_ARGUMENT_NUMBER;
 	  }
-	  optind++;
-	  cmd_input.bpf_limit_bandwidth_command_file = argv[optind++];
+	  optind++
+	  cmd.bpf_limit_bandwidth_cgroup_path = argv[optind++]
+	  cmd.bpf_limit_bandwidth_mbit = argv[optind++]
       *operation = BPF_LIMIT_BANDWIDTH;
       return 0;
     } else {
@@ -707,11 +708,11 @@ int main(int argc, char **argv) {
   case TRAFFIC_CONTROL_READ_STATS:
     exit_code = traffic_control_read_stats(cmd_input.traffic_control_command_file);
     break;
-  case
   case BPF_LIMIT_BANDWIDTH:
-    exit_code = run_bpf_egress_limiter(cmd_input.traffic_control_command_file);
+    exit_code = run_bpf_egress_limiter(
+									cmd_input.bpf_limit_bandwidth_cgroup_path,
+									cmd_input.bpf_limit_bandwidth_mbit);
     break;
-  case
   case EXEC_CONTAINER:
     exit_code = exec_container(cmd_input.command_file);
     break;

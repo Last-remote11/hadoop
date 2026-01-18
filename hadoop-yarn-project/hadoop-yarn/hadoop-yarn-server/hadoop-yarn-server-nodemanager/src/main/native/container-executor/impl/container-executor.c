@@ -103,9 +103,6 @@ static const char* TC_MODIFY_STATE_OPTS [] = { "-b" , NULL};
 static const char* TC_READ_STATE_OPTS [] = { "-b", NULL};
 static const char* TC_READ_STATS_OPTS [] = { "-s",  "-b", NULL};
 
-//location of BPF runner? binary
-static const char* BPF_BIN = ""; // HADOOP_YARN_HOME/bin/egress
-
 //struct to store the user details
 struct serialized_passwd *user_detail = NULL;
 
@@ -3138,8 +3135,9 @@ int run_bpf_egress_limiter(char *cgroup_path, char *mbps) {
     }
     return 0;
   } else {
-    char *args[] = { BPF_BIN, cgroup_path, mbps, NULL };
-    execv(BPF_BIN, args);
+  	char **bpf_bin = get_section_values(BPF_BIN_PATH_KEY, &executor_cfg);
+    char *args[] = { bpf_bin, cgroup_path, mbps, NULL };
+    execv(bpf_bin, args);
     //if we reach here, exec failed
     fprintf(LOGFILE, "failed to execute tc command! error: %s\n", strerror(errno));
     _exit(TRAFFIC_CONTROL_EXECUTION_FAILED);
