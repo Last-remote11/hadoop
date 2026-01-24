@@ -318,6 +318,14 @@ int traffic_control_read_state(char *command_file);
  */
 int traffic_control_read_stats(char *command_file);
 
+/** Check if bpf is enabled in configuration. */
+int is_bpf_support_enabled();
+
+/**
+ * Attach a bpf program to kernel that limits egress network bandwidth.
+ */
+int run_bpf_egress_limiter(char *cgroup_path, char *mbps);
+
 /** Check if docker support is enabled in configuration. */
 int is_docker_support_enabled();
 

@@ -376,7 +376,7 @@ static int validate_arguments(int argc, char **argv , int *operation) {
 		display_usage(stdout);
 		return INVALID_ARGUMENT_NUMBER;
 	  }
-	  optind++
+	  optind++;
 	  cmd.bpf_limit_bandwidth_cgroup_path = argv[optind++]
 	  cmd.bpf_limit_bandwidth_mbit = argv[optind++]
       *operation = BPF_LIMIT_BANDWIDTH;

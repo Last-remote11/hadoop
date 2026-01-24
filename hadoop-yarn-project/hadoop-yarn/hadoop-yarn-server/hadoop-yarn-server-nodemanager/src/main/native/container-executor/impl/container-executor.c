@@ -3136,8 +3136,8 @@ int run_bpf_egress_limiter(char *cgroup_path, char *mbps) {
     return 0;
   } else {
   	char **bpf_bin = get_section_values(BPF_BIN_PATH_KEY, &executor_cfg);
-    char *args[] = { bpf_bin, cgroup_path, mbps, NULL };
-    execv(bpf_bin, args);
+    char *args[] = { &bpf_bin, cgroup_path, mbps, NULL };
+    execv(&bpf_bin, args);
     //if we reach here, exec failed
     fprintf(LOGFILE, "failed to execute tc command! error: %s\n", strerror(errno));
     _exit(TRAFFIC_CONTROL_EXECUTION_FAILED);
