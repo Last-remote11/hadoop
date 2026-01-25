@@ -239,16 +239,6 @@ if (HAVE_BPF AND LIBBPF_INCLUDE_DIR AND LIBBPF_LIB)
     )
 endif()
 
-if (HAVE_BPF)
-	add_executable(egress
-		main/native/bpf-program/bandwidth/impl/egress.c
-		main/native/bpf-program/bandwidth/impl/egress.h
-    )
-    add_executable(egress_bpf
-        main/native/bpf-program/bandwidth/impl/egress_bpf.c
-    )
-endif()
-
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     # macOS doesn't have librt
     target_link_libraries(test-oom-listener gtest)
