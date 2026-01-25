@@ -165,6 +165,12 @@
     "ubuntu:noble": "libbcprov-java",
     "ubuntu:noble::arch64": "libbcprov-java"
   },
+  "libelf": {
+    "ubuntu:focal": "libelf-dev"
+  },
+  "libbpf": {
+    "ubuntu:focal": "libbpf-dev"
+  },
   "libtool": {
     "debian:12": "libtool",
     "debian:13": "libtool",
