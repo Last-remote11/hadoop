@@ -158,7 +158,7 @@ int main(int argc, char **argv)
 	uid_t euid = geteuid();
 
     if (euid != 0) {
-        printf("Promote to root...\n", euid);
+        printf("Promote to root...\n");
         char **new_argv = malloc(sizeof(char *) * (argc + 2));
 
         new_argv[0] = "sudo";
