@@ -221,23 +221,23 @@ find_path(LIBBPF_INCLUDE_DIR NAMES bpf/libbpf.h)
 find_library(LIBBPF_LIB NAMES bpf)
 find_program(CLANG_EXE clang)
 
-if (HAVE_BPF AND LIBBPF_INCLUDE_DIR AND LIBBPF_LIB)
-    add_executable(egress
-     	main/native/bpf-program/bandwidth/impl/egress.c
-		main/native/bpf-program/bandwidth/impl/egress.h
-	)
-    target_include_directories(egress PRIVATE ${LIBBPF_INCLUDE_DIR})
-    target_link_libraries(egress PRIVATE ${LIBBPF_LIB} elf z)
+#if (HAVE_BPF AND LIBBPF_INCLUDE_DIR AND LIBBPF_LIB)
+add_executable(egress
+	main/native/bpf-program/bandwidth/impl/egress.c
+	main/native/bpf-program/bandwidth/impl/egress.h
+)
+target_include_directories(egress PRIVATE ${LIBBPF_INCLUDE_DIR})
+target_link_libraries(egress PRIVATE ${LIBBPF_LIB} elf z)
 
-    output_directory(egress target/usr/local/bin)
+output_directory(egress target/usr/local/bin)
 
-    add_custom_command(
-        OUTPUT target/usr/local/bin/egress_bpf.o
-        COMMAND ${CLANG_EXE} -g -O2 -target bpf
-         		-c main/native/bpf-program/bandwidth/impl/egress_bpf.c
-                -o target/usr/local/bin/egress_bpf.o
-    )
-endif()
+add_custom_command(
+	OUTPUT target/usr/local/bin/egress_bpf.o
+	COMMAND ${CLANG_EXE} -g -O2 -target bpf
+			-c main/native/bpf-program/bandwidth/impl/egress_bpf.c
+			-o target/usr/local/bin/egress_bpf.o
+)
+#endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     # macOS doesn't have librt
