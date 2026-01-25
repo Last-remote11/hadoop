@@ -46,7 +46,7 @@ check_function_exists(fdopendir HAVE_FDOPENDIR)
 check_function_exists(fstatat HAVE_FSTATAT)
 check_function_exists(openat HAVE_OPENAT)
 check_function_exists(unlinkat HAVE_UNLINKAT)
-check_function_exists(bpf HAVE_BPF)
+# check_function_exists(bpf HAVE_BPF)
 
 include(CheckSymbolExists)
 check_symbol_exists(sysctl "sys/types.h;sys/sysctl.h" HAVE_SYSCTL)
