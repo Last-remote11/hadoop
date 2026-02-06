@@ -219,7 +219,6 @@ add_executable(test-oom-listener
 # BPF
 find_path(LIBBPF_INCLUDE_DIR NAMES bpf/libbpf.h)
 find_library(LIBBPF_DEV NAMES libbpf-dev)
-find_library(LIBBPF_0 NAMES libbpf0)
 find_program(CLANG_EXE clang)
 
 #if (HAVE_BPF AND LIBBPF_INCLUDE_DIR AND LIBBPF_LIB)
@@ -228,7 +227,7 @@ add_executable(egress
 	main/native/bpf-program/bandwidth/impl/egress.h
 )
 target_include_directories(egress PRIVATE ${LIBBPF_INCLUDE_DIR})
-target_link_libraries(egress PRIVATE ${LIBBPF_LIB} ${LIBBPF_0} elf z)
+target_link_libraries(egress PRIVATE ${LIBBPF_LIB} elf z)
 
 output_directory(egress target/usr/local/bin)
 
