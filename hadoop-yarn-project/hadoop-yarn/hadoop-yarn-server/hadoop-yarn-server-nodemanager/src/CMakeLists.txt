@@ -237,7 +237,10 @@ if (LIBBPF_INCLUDE_DIR AND LIBBPF_LIB)
 				-c main/native/bpf-program/bandwidth/impl/egress_bpf.c
 				-o target/usr/local/bin/egress_bpf.o
 	)
-	add_custom_target(build_egress_bpf ALL)
+	add_custom_target(
+		build_egress_bpf ALL
+		DEPENDS "target/usr/local/bin/egress_bpf.o"
+	)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
