@@ -117,7 +117,7 @@ static int run_bpf_prog(char *prog, char *cgroup_dir, uint64_t mbps)
 
 	printf("rate set to %lu Mbps per second\n", rate);
 
-	if (bpf_map__update_elem(queue_rate, &key, 4, &rate, 8, BPF_ANY)) {
+	if (bpf_map_update_elem(queue_rate, &key, &rate, BPF_ANY)) {
 		printf("ERROR: Could not update map element\n");
 		rc = 1;
 	}
