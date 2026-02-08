@@ -238,6 +238,7 @@ if (LIBBPF_INCLUDE_DIR AND LIBBPF_LIB)
 				-I/usr/include/x86_64-linux-gnu
 				-c ${CMAKE_CURRENT_SOURCE_DIR}/main/native/bpf-program/bandwidth/impl/egress_bpf.c
 				-o target/usr/local/bin/egress_bpf.o
+		COMMAND chmod 755 ${CMAKE_CURRENT_BINARY_DIR}/target/usr/local/bin/egress_bpf.o
 	)
 	add_custom_target(
 		build_egress_bpf ALL
