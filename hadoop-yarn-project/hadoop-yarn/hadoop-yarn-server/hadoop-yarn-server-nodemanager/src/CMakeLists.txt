@@ -234,7 +234,7 @@ if (LIBBPF_INCLUDE_DIR AND LIBBPF_LIB)
 	add_custom_command(
 		OUTPUT target/usr/local/bin/egress_bpf.o
 		COMMAND ${CLANG_EXE} -g -O2 -target bpf
-				-c main/native/bpf-program/bandwidth/impl/egress_bpf.c
+				-c ${CMAKE_CURRENT_SOURCE_DIR}/main/native/bpf-program/bandwidth/impl/egress_bpf.c
 				-o target/usr/local/bin/egress_bpf.o
 	)
 	add_custom_target(
