@@ -231,8 +231,7 @@ if (LIBBPF_INCLUDE_DIR AND LIBBPF_LIB)
 
 	output_directory(egress target/usr/local/bin)
 
-	add_custom_command(
-		OUTPUT target/usr/local/bin/egress_bpf.o
+	add_custom_command(TARGET build_egress_bpf
 		COMMAND ${CLANG_EXE} -g -O2 -target bpf
 				-c main/native/bpf-program/bandwidth/impl/egress_bpf.c
 				-o target/usr/local/bin/egress_bpf.o
